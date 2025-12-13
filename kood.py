@@ -257,7 +257,7 @@ def ava_peaaken():
 
     root = tk.Tk()
     root.title("Tudengi eelarve haldur")
-    root.geometry("420x600")
+    root.state("zoomed")
     root.configure(bg="#1e1e1e")
 
     # Pealkiri
@@ -298,8 +298,8 @@ def ava_peaaken():
         kast.pack(fill="x", padx=10, pady=5)
         return kast
 
-    entry_kuup = lisa_rida("Kuupäev (YYYY-MM-DD)")
-    entry_kuup.insert(0, str(datetime.today().date()))
+    entry_kuup = lisa_rida("Kuupäev (PP.KK.AAAA)")
+    entry_kuup.insert(0, datetime.today().strftime("%d.%m.%Y"))
     
     #Kategooria rippmenüü ja 'Muu' tekstikast
     tk.Label(raam, text="Kategooria", fg="white",bg="#2a2a2a").pack(anchor="w",padx=10)
@@ -373,7 +373,7 @@ def ilus_sisselogimine():
 
     kasutaja_aken = tk.Tk()
     kasutaja_aken.title("Sisselogimine")
-    kasutaja_aken.geometry("360x260")
+    kasutaja_aken.state("zoomed")
     kasutaja_aken.configure(bg="#1e1e1e")
 
     tk.Label(
