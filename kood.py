@@ -136,7 +136,7 @@ def kuva_kuu_kokkuvote():
     with open(fail, "r", encoding="UTF-8") as f:
         reader = csv.DictReader(f)
         for rida in reader:
-            kuup = datetime.strptime(rida["Kuupäev"], "%Y-%m-%d") #teeb tekstist päris kuupäeva objekti
+            kuup = datetime.strptime(rida["Kuupäev"], "%d.%m.%Y") #teeb tekstist päris kuupäeva objekti
 
             if kuup.month == see_kuu and kuup.year == see_aasta:
                 kat = rida["Kategooria"]
