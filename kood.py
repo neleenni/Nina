@@ -1,20 +1,21 @@
-import tkinter as tk
-from tkinter import messagebox
-from tkinter import ttk
-import csv
-import os
-from datetime import datetime
-import matplotlib.pyplot as plt
+#Tegemist on tudengi eelarverakendusega, mis aitab järge pidada Teie igakuistel väljaminekutel. 
+#Töö autoriteks on Nele Enni ja Katariina Golubtsov
 
-# -----------------------
+
+#Tkinter - graafiliste akende jaoks (nupud, tekstikastid, rippmenüüd, uued aknad)
+import tkinter as tk
+from tkinter import messagebox #hüpikaknad nt kui vale parool või kulu lisatud
+from tkinter import ttk #treeview tabel kulude jaoks, ridade valimiseks, kustutamiseks
+import csv #loeb, kirjutab csv faile
+import os #kontrollib kas kasutaja kulude fail juba eksisteerib
+from datetime import datetime #tänane kuupäev
+import matplotlib.pyplot as plt #sektordiagramm, graafikud eraldi aknas
+
 # Globaalsed muutujad
-# -----------------------
 kasutaja = ""
 valitud_kuu = datetime.today().month
 
-# -----------------------
 # Sisselogimine / kasutaja kontroll
-# -----------------------
 def alusta():
     global kasutaja
     kasutaja = entry_kasutaja.get()
@@ -52,9 +53,7 @@ def alusta():
     kasutaja_aken.destroy()
     ava_peaaken()
 
-# -----------------------
 # Kulu lisamine
-# -----------------------
 def lisa_kulu():
     try:
         kuupäev = entry_kuup.get()
@@ -84,11 +83,9 @@ def lisa_kulu():
 
     messagebox.showinfo("Lisatud", "Kulu edukalt lisatud!")
 
-# -----------------------
 # Piiri kontroll
-# -----------------------
 def kontrolli_piiri():
-    kokku = {}
+    kokku = {} #loob sõnastiku
     fail = f"{kasutaja}_kulud.csv"
 
     with open(fail, "r", encoding="UTF-8") as f:
@@ -104,12 +101,10 @@ def kontrolli_piiri():
             kokku[kat][0] += summa
 
     for kat, (summa, piir) in kokku.items():
-        if summa > piir:
+        if summa > piir: #kui summa ületab piiri, tuleb teavitus
             messagebox.showwarning("Hoiatus!", f"{kat} on ületanud piiri!")
 
-# -----------------------
-# Graafik
-# -----------------------
+# Graafik, eesmärk lugeda kulud, joonistada sektordiagramm
 def kuva_graafik():
     kokku = {}
     fail = f"{kasutaja}_kulud.csv"
@@ -127,11 +122,9 @@ def kuva_graafik():
 
     plt.pie(kokku.values(), labels=kokku.keys(), autopct="%1.1f%%")
     plt.title("Kulude jaotus")
-    plt.show()
+    plt.show() #matplotlib avab eraldi akna
 
-# -----------------------
-# Kuu kokkuvõte
-# -----------------------
+# Kuu kokkuvõte, näitab ainult valitud kuu kulusid
 def kuva_kuu_kokkuvote():
     fail = f"{kasutaja}_kulud.csv"
     kokku = {}
@@ -143,12 +136,13 @@ def kuva_kuu_kokkuvote():
     with open(fail, "r", encoding="UTF-8") as f:
         reader = csv.DictReader(f)
         for rida in reader:
-            kuup = datetime.strptime(rida["Kuupäev"], "%Y-%m-%d")
+            kuup = datetime.strptime(rida["Kuupäev"], "%Y-%m-%d") #teeb tekstist päris kuupäeva objekti
 
             if kuup.month == see_kuu and kuup.year == see_aasta:
                 kat = rida["Kategooria"]
                 summa = float(rida["Summa"])
                 kokku[kat] = kokku.get(kat, 0) + summa
+            
 
     kokku_aken = tk.Toplevel()
     kokku_aken.title("Kuu kokkuvõte")
@@ -203,10 +197,9 @@ def kuva_kuu_kokkuvote():
         fg="white",
         command=kokku_aken.destroy
     ).pack(pady=10, fill="x", padx=10)
+    #Tulemused: uus Toplevel aken, tekstiline kokkuvõte, kogusumma
 
-# -----------------------
 # Kulude vaatamine ja kustutamine
-# -----------------------
 def kuva_kulud_ja_kustuta():
     fail = f"{kasutaja}_kulud.csv"
 
@@ -228,7 +221,7 @@ def kuva_kulud_ja_kustuta():
             tabel.insert("", "end", values=rida)
 
     def kustuta_valitud():
-        valik = tabel.selection()
+        valik = tabel.selection() #saab valitud rea
         if not valik:
             messagebox.showinfo("Info", "Vali kõigepealt rida, mida kustutada.")
             return
@@ -242,15 +235,14 @@ def kuva_kulud_ja_kustuta():
             writer = csv.writer(f)
             for r in read:
                 if r != list(map(str, rida)):
-                    writer.writerow(r)
+                    writer.writerow(r) #kirjutab faili kõik peale valitud rea
 
         tabel.delete(valik)
 
     tk.Button(aken, text="❌ Kustuta valitud kulu", command=kustuta_valitud).pack(pady=10)
 
-# -----------------------
 # Peaaken
-# -----------------------
+# Luuakse kõik väljad, rippmenüüd, nupud, seosed funktsioonidega
 def ava_peaaken():
     global entry_kuup, entry_summa, entry_markus, entry_piir
     global kat_valik, entry_kat_muu
@@ -260,7 +252,7 @@ def ava_peaaken():
     root.state("zoomed")
     root.configure(bg="#1e1e1e")
 
-    # Pealkiri
+    #Pealkiri
     pealkiri = tk.Label(
         root,
         text="💰 Tudengi Eelarverakendus",
@@ -270,7 +262,7 @@ def ava_peaaken():
     )
     pealkiri.pack(pady=10)
 
-    # Sisu raam
+    #Sisu raam
     raam = tk.Frame(root, bg="#2a2a2a")
     raam.pack(padx=20, pady=10, fill="both", expand=True)
 
@@ -365,9 +357,8 @@ def ava_peaaken():
 
     root.mainloop()
 
-# -----------------------
 # Sisselogimise aken
-# -----------------------
+# Luuakse esimene aken, võtab kasutajanime/parooli
 def ilus_sisselogimine():
     global entry_kasutaja, entry_parool, kasutaja_aken
 
@@ -415,12 +406,10 @@ def ilus_sisselogimine():
         font=("Segoe UI", 12, "bold"),
         bg="#4CAF50",
         fg="white",
-        command=alusta
+        command=alusta #nupp käivitab sisselogimise kontrolli
     ).pack(pady=20, fill="x", padx=20)
 
     kasutaja_aken.mainloop()
 
-# -----------------------
 # Programmi käivitamine
-# -----------------------
 ilus_sisselogimine()
